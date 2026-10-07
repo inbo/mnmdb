@@ -33,7 +33,7 @@ terminate_keyring <- function(keyring_label = "mnmdb_temp") {
 
     if (nrow(keys) > 0) {
       # ... and delete them
-      for (k in nrow(keys)) {
+      for (k in seq_length(nrow(keys))) {
         # k <- 1
         keyring::key_delete(
           service = keys[[k, "service"]],
