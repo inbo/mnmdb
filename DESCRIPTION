@@ -22,7 +22,8 @@ Imports:
     rlang,
     RPostgres,
     S7,
-    sf
+    sf,
+    tidyselect
 Suggests: 
     knitr,
     magrittr,
