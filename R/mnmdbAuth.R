@@ -181,9 +181,10 @@ mnmdbAuthConf <- S7::new_class(
     params <- list(...)
 
     # if user does not provide input, check config
-    config_params <- configr::read.config(file = config_file)[[
-      params$connection_profile
-    ]]
+    copro <- params$connection_profile
+    if (is.null(copro)) copro <- 1
+    config_params <- configr::read.config(file = config_file)[[copro]]
+
     for (p in names(config_params)) {
       if (is.null(params[[p]])) {
         params[[p]] <- config_params[[p]]
