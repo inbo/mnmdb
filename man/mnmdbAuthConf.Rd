@@ -11,7 +11,7 @@ mnmdbAuthConf(config_file, ...)
 
 \item{...}{not used (consturctor)}
 
-\item{config_profile}{(optional) number or name of the
+\item{connection_profile}{(optional) number or name of the
 parameter block in \code{.conf} file (if there are multiple)}
 }
 \description{
