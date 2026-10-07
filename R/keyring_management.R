@@ -4,6 +4,51 @@
 # (Works well on Linux.)
 
 
+#' Strip unwanted characters from a keyring label user input.
+#'
+#' The keyring label is used in an `Rscript` background process;
+#' code injection would be possible by providing a system command.
+#' This cleaning function will strip all except alphanumeric and some coupling
+#' characters from the user input.
+#' The function is exported to allow use by the user in external env.
+#'
+#' @param keyring_label_input a raw keyring label input
+#' @returns (character) a clean keyring label
+#'
+#' @export
+#'
+clean_keyring_label <- function(keyring_label_input) {
+  # ref: https://stackoverflow.com/questions/29550681/r-extract-alphanumeric-strings-from-text
+  # testing: # keyring_label <- "{type: [{a: a1, _timestamp: 1}, - {a:a2, : -timestamp: 2}]} _"
+
+  # regex-clean the label string
+  keyring_label_out <- paste0(
+      regmatches(
+      keyring_label_input,
+      gregexpr(
+        "((?![0-9]+)[A-Za-z0-9_:-]+)",
+        keyring_label_input,
+        perl = TRUE
+      )
+    )[[1L]],
+    collapse = ""
+  )
+
+  # annoy the user
+  if (isFALSE(keyring_label_input == keyring_label_out)) {
+    message(glue::glue(
+      "Please note: The keyring label was changed to `{keyring_label_out}`."
+    ))
+    message(
+      "\tYou can use `mnmdb::clean_keyring_label()` to ensure label validity."
+    )
+  }
+
+  return(keyring_label_out)
+
+} # /clean_keyring_label
+
+
 #' terminate and clean up a given keyring
 #'
 #' This function will loop through all labels in a given keyring,
@@ -20,6 +65,9 @@ terminate_keyring <- function(keyring_label = "mnmdb_temp") {
   if (keyring_label == "Login") {
     stop("The `Login` keyring should not be deleted or emptied.")
   }
+
+  # pevent non-alphanumeric characters in keyring label
+  keyring_label <- clean_keyring_label(keyring_label)
 
   # only empty if keyring still exists
   if (isFALSE(keyring_label %in% keyring::keyring_list()$keyring)) {
@@ -52,6 +100,7 @@ terminate_keyring <- function(keyring_label = "mnmdb_temp") {
 } # /terminate_keyring
 
 
+
 #' Lock the keyring after a delay. (only on Linux)
 #'
 #' This function will launch a background process via `system`
@@ -63,6 +112,9 @@ terminate_keyring <- function(keyring_label = "mnmdb_temp") {
 lock_keyring_delayed <- function(keyring_label = "mnmdb_temp", delay = 3600) {
 
   require_pkgs(c("glue", "keyring"), quietly = TRUE)
+
+  # prevent code injection
+  keyring_label <- clean_keyring_label(keyring_label)
 
   # string building blocks
   l <- glue::glue('\"{keyring_label}\"')
@@ -99,11 +151,15 @@ unlock_keyring <- function(keyring_label = "mnmdb_temp", ...) {
 
   require_pkgs(c("keyring"), quietly = TRUE)
 
+  # pevent non-alphanumeric characters in keyring label
+  keyring_label <- clean_keyring_label(keyring_label)
+
+  # check if label is in the keyring
   if (isFALSE(keyring_label %in% keyring::keyring_list()$keyring)) {
     init_keyring(keyring_label = keyring_label)
   }
 
-
+  # open door shortcut: keyring was not locked
   if (isFALSE(keyring::keyring_is_locked(keyring_label))) return(invisible(NULL))
 
   # unlock the keyring
@@ -126,6 +182,9 @@ unlock_keyring <- function(keyring_label = "mnmdb_temp", ...) {
 init_keyring <- function(keyring_label = "mnmdb_temp") {
 
   require_pkgs(c("glue", "keyring"), quietly = TRUE)
+
+  # pevent non-alphanumeric characters in keyring label
+  keyring_label <- clean_keyring_label(keyring_label)
 
   # note that you can create two keyrings of the same name! (shadowing)
   # avoid stacking keyrings with the same name
@@ -179,6 +238,9 @@ store_db_password <- function(
   if (isFALSE(keyring_label %in% keyring::keyring_list()$keyring)) {
     init_keyring(keyring_label)
   }
+
+  # pevent non-alphanumeric characters in keyring label
+  keyring_label <- clean_keyring_label(keyring_label)
 
   # ad-hoc function to prompt a password and unlock keyring
   ask_password <- function() {
