@@ -100,7 +100,7 @@ S7::method(connect, mnmdbConnection) <- function(conn) {
 
   # shortcut for the already connected
   if (isFALSE(is.null(conn@database_connection))) {
-    if (DBI::dbIsValid(database_connection)) {
+    if (DBI::dbIsValid(conn@database_connection)) {
       return(conn)
     }
   }
