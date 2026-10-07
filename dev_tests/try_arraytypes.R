@@ -129,7 +129,6 @@ data_final %>% glimpse()
 # We should also be able to upload the data
 data_upload <- data_final[1,]
 
-
 data_upload[[1, "arr"]] <- list(c(1, 1))
 data_upload[[1, "vector"]] <- list(c(1, 1))
 
