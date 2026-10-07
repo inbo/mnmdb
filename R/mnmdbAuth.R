@@ -150,7 +150,7 @@ mnmdbAuth <- S7::new_class(
 #' in a config file (e.g. in the `config_files` folder).
 #'
 #' @param config_file file.path to a config file to load with `configr`
-#' @param config_profile (optional) number or name of the
+#' @param connection_profile (optional) number or name of the
 #'        parameter block in `.conf` file (if there are multiple)
 #' @param ... not used (consturctor)
 #'
