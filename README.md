@@ -51,7 +51,14 @@ auth <- mnmdb::mnmdbAuth(
 
 Some of these parameters can be omitted and are replaced by defaults (e.g. `port`), though explicit user input takes precedence.
 
-The password will be stored in the system keyring via R's [`keyring` package](https://keyring.r-lib.org/index.html) ([tutorial](https://tutorials.inbo.be/tutorials/r_keyring/)); if no password is provided, it will be prompted.
+The connection password, no matter how it is provided, will be stored in the system keyring via R's [`keyring` package](https://keyring.r-lib.org/index.html) ([tutorial](https://tutorials.inbo.be/tutorials/r_keyring/)).
+If no password is provided, it will be prompted.
+There are multiple options to submit a password to the connector, thereby avoiding any prompt: 
+(i) as a direct argument, e.g. via environment variables; 
+(ii) stored in a connection config file which should be `.gitignore`d as described below; 
+(iii) via [postgresql `.pgpass`](https://www.postgresql.org/docs/current/libpq-pgpass.html), in which case `password = NA` should be submitted to avoid prompts.
+
+Please make sure to never hard-code or even git-commit any passwords.
 
 
 More convenient for handling connections to multiple databases will be storage of config files.
@@ -114,8 +121,8 @@ data <- sf::st_read(
     mnmdbconn@database_connection,
     layer = DBI::Id("inbound", "Locations"),
     geometry_column = "wkb_geometry"
-  ) %>%
-  dplyr::select(-ogc_fid) %>%
+  ) |>
+  dplyr::select(-ogc_fid) |>
   sf::st_as_sf(crs = 31370)
 ```
 
@@ -133,8 +140,8 @@ The most basic / important one would be `query_table`:
 mnmdbconn |> query_table(
     DBI::Id("test", "mtcars"),
     subselect = c("mpg", "cyl", "disp", "hp")
-  )  %>%
-  head(5) %>%
+  )  |>
+  head(5) |>
   knitr::kable()
 
 ```

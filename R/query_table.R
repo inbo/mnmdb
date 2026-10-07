@@ -27,6 +27,20 @@ query_table <- S7::new_generic("query_table", "conn")
 #'
 S7::method(query_table, mnmdbConnection) <- function(conn, table_id, subselect = NA) {
 
+
+  # optionally subselect
+  if (is.scalar.na(subselect)) {
+    subselect_pipe_function <- \(df) df
+  } else {
+
+    subselect_pipe_function <- function(df) {
+      return(
+        df |>
+          dplyr::select(tidyselect::any_of(subselect))
+      )
+    }
+  }
+
   is_spatial <- FALSE
   if (is_spatial) {
     # TODO not implemented / requires structure info
@@ -38,6 +52,7 @@ S7::method(query_table, mnmdbConnection) <- function(conn, table_id, subselect =
         geometry_column = "wkb_geometry"
       ) |>
       dplyr::select(-ogc_fid) |>
+      subselect_pipe_function() |>
       sf::st_as_sf(crs = 31370)
 
     sf::st_geometry(data) <- "wkb_geometry"
@@ -49,23 +64,22 @@ S7::method(query_table, mnmdbConnection) <- function(conn, table_id, subselect =
         conn@database_connection,
         table_id
       ) |>
+      subselect_pipe_function() |>
       dplyr::collect()
 
   }
 
+  ## TODO handle data types, e.g. grts bigint, datetime(3)
+  # grts_datatype_to_integer() |>
+  # convert_df_datetime_types_to_character() |>
   # data |>
   #   unlist_keep_na(purrr::map(log_creation, convert_timestamp_to_ms_character))
   # ) |>
 
 
-  if (isFALSE(is.scalar.na(subselect))) {
-    data <- data |>
-      dplyr::select(!!!rlang::syms(subselect))
-  }
-
-    # grts_datatype_to_integer() |>
-    # convert_df_datetime_types_to_character() |>
+  # ensure "tibble" data type
   data <- data |> dplyr::as_tibble()
+
   return(data)
 
 }
