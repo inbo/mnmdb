@@ -150,7 +150,7 @@ mnmdbAuth <- S7::new_class(
 #' in a config file (e.g. in the `config_files` folder).
 #'
 #' @param config_file file.path to a config file to load with `configr`
-#' @param config_profile (optional) number or name of the
+#' @param connection_profile (optional) number or name of the
 #'        parameter block in `.conf` file (if there are multiple)
 #' @param ... not used (consturctor)
 #'
@@ -181,9 +181,10 @@ mnmdbAuthConf <- S7::new_class(
     params <- list(...)
 
     # if user does not provide input, check config
-    config_params <- configr::read.config(file = config_file)[[
-      params$connection_profile
-    ]]
+    copro <- params$connection_profile
+    if (is.null(copro)) copro <- 1
+    config_params <- configr::read.config(file = config_file)[[copro]]
+
     for (p in names(config_params)) {
       if (is.null(params[[p]])) {
         params[[p]] <- config_params[[p]]

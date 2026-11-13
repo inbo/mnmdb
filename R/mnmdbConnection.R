@@ -1,6 +1,6 @@
 #!usr/bin/env Rscript
 
-# If you want to learn how the connection to an MNM Database is managed, 
+# If you want to learn how the connection to an MNM Database is managed,
 # this is the file-to-be.
 
 
@@ -100,7 +100,7 @@ S7::method(connect, mnmdbConnection) <- function(conn) {
 
   # shortcut for the already connected
   if (isFALSE(is.null(conn@database_connection))) {
-    if (DBI::dbIsValid(database_connection)) {
+    if (DBI::dbIsValid(conn@database_connection)) {
       return(conn)
     }
   }

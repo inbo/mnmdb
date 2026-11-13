@@ -1,5 +1,10 @@
 #!usr/bin/env Rscript
 
+keyring_label <- "mnmdb_temp' && echo 'this is a test'"
+if (!(keyring_label %in% keyring::keyring_list()$keyring)) {
+  init_keyring(keyring_label)
+}
+
 # use the `seahorse` util to double check
 keyring_label <- "mnmdb_temp"
 if (!(keyring_label %in% keyring::keyring_list()$keyring)) {

@@ -1,6 +1,6 @@
 Package: mnmdb
 Title: Manage connection to MNE databases
-Version: 0.1
+Version: 0.2
 Authors@R: c(
   person("Falk", "Mielke", , "falk.mielke@inbo.be", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-3229-0981")
@@ -22,7 +22,8 @@ Imports:
     rlang,
     RPostgres,
     S7,
-    sf
+    sf,
+    tidyselect
 Suggests: 
     knitr,
     magrittr,
